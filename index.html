@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Identity Verification</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #111; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; touch-action: none; }
+        #status { font-size: 18px; margin-bottom: 30px; text-align: center; padding: 0 20px; line-height: 1.5; }
+        .scanner { width: 150px; height: 150px; border: 4px solid #00ff00; border-radius: 50%; display: flex; justify-content: center; align-items: center; position: relative; box-shadow: 0 0 20px #00ff00; transition: 0.2s; }
+        .scanner:active { transform: scale(0.9); background: rgba(0, 255, 0, 0.2); }
+        .progress-bar { width: 250px; height: 10px; background: #333; margin-top: 40px; border-radius: 5px; overflow: hidden; }
+        #fill { width: 0%; height: 100%; background: #00ff00; transition: 0.1s; }
+        .fingerprint { font-size: 60px; filter: grayscale(1); }
+    </style>
+</head>
+<body>
+
+<div id="status">Hold your finger on the scanner to verify <br><b>(Biometric Security v8.4)</b></div>
+
+<div class="scanner" id="sensor">
+    <div class="fingerprint">☝️</div>
+</div>
+
+<div class="progress-bar"><div id="fill"></div></div>
+
+<script>
+    const sensor = document.getElementById('sensor');
+    const fill = document.getElementById('fill');
+    const status = document.getElementById('status');
+    let progress = 0;
+    let timer;
+
+    const insults = [
+        "Finger too crooked. Re-align!",
+        "Primate DNA detected. Try again.",
+        "Screen too greasy. Clean it!",
+        "Error: Identity not found. Do you even exist?",
+        "Scanning... Wait, is that a weird photo in your gallery? 😱"
+    ];
+
+    function startScan(e) {
+        e.preventDefault();
+        timer = setInterval(() => {
+            progress += 2;
+            fill.style.width = progress + '%';
+            status.innerHTML = "Scanning: " + progress + "%";
+
+            // Prank resets at random high percentages
+            if ((progress > 35 && Math.random() > 0.96) || (progress > 75 && Math.random() > 0.92)) {
+                resetScan();
+            }
+
+            if (progress >= 100) {
+                clearInterval(timer);
+                finishPrank();
+            }
+        }, 50);
+    }
+
+    function resetScan() {
+        clearInterval(timer);
+        progress = 0;
+        fill.style.width = '0%';
+        status.style.color = '#ff4444';
+        status.innerHTML = insults[Math.floor(Math.random() * insults.length)];
+        setTimeout(() => { status.style.color = 'white'; }, 1500);
+    }
+
+    function finishPrank() {
+        document.body.innerHTML = `
+            <div style="text-align:center; color: #ff00ff; font-weight: bold; padding: 20px;">
+                <h1 style="font-size: 36px; text-transform: uppercase;">Access Denied!</h1>
+                <p style="font-size: 18px;">Your IQ level is too low for this device.</p>
+                <p style="color: #00ff00;">Self-destruction sequence initiated: 10s...</p>
+                <img src="https://media.giphy.com" width="280" style="margin-top: 20px; border-radius: 10px;">
+            </div>
+        `;
+    }
+
+    sensor.addEventListener('touchstart', startScan);
+    sensor.addEventListener('touchend', resetScan);
+    
+    // Fallback for mouse testing
+    sensor.addEventListener('mousedown', startScan);
+    sensor.addEventListener('mouseup', resetScan);
+</script>
+
+</body>
+</html>
